@@ -45,9 +45,11 @@ combined_odds <- combined_odds_clean %>%
   mutate(favored_pts = max(WPts, LPts),
          underdog_pts = min(WPts, LPts),
          fu_pt_difference = favored_pts - underdog_pts,
+         fu_pt_ratio = favored_pts / underdog_pts, 
          favored_odds = max(B365W_prob, B365L_prob),
          underdog_odds = min(B365W_prob, B365L_prob),
-         fu_odds_difference = favored_odds - underdog_odds)
+         fu_odds_difference = favored_odds - underdog_odds,
+         fu_odds_ratio = favored_odds / underdog_odds)
 glimpse(combined_odds)
 
 #write out data
