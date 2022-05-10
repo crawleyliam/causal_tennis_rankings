@@ -29,25 +29,22 @@ combined_odds_clean <- combined_odds_raw %>%
   
   
 combined_odds <- combined_odds_clean %>% 
-# TODO: convert odds to probabilities for each of 
-  mutate(B365W_prob = B365W / (B365W + B365L),
-         B365L_prob = B365L / (B365W + B365L)) %>% 
+  # TODO: rename avg odds
+  rename(avg_winner_odds = AvgW,
+         avg_loser_odds = AvgL) %>% 
+  
 # TODO: create upset columns
   mutate(rank_upset = if_else(LRank < WRank, 1, 0), # "lower" rank is better
          pts_upset = if_else(LPts > WPts, 1, 0), 
-         B365_upset = if_else(B365L_prob > B365W_prob, 1, 0)) %>% 
-
-# TODO: winner minus loser point difference and probs (upsets will be negative)
-  mutate(WL_pt_diff = WPts - LPts,
-         WL_odds_diff = B365W_prob - B365L_prob) %>% 
-# TODO: favored minus underdog point difference and probs 
+         odds_upset = if_else(avg_loser_odds < avg_winner_odds, 1, 0)) %>% 
+# TODO: favored minus underdog point difference and odds 
   rowwise %>% 
   mutate(favored_pts = max(WPts, LPts),
          underdog_pts = min(WPts, LPts),
          fu_pt_difference = favored_pts - underdog_pts,
          fu_pt_ratio = favored_pts / underdog_pts, 
-         favored_odds = max(B365W_prob, B365L_prob),
-         underdog_odds = min(B365W_prob, B365L_prob),
+         favored_odds = min(avg_winner_odds, avg_loser_odds),
+         underdog_odds = max(avg_winner_odds, avg_loser_odds),
          fu_odds_difference = favored_odds - underdog_odds,
          fu_odds_ratio = favored_odds / underdog_odds)
 glimpse(combined_odds)
