@@ -5,10 +5,11 @@ combined_odds <- read_csv(here("data/combined_odds.csv"))
 ##Models##
 
 ##probit model, no instruments, upsets based on rank
-probitMod_pts <- glm(pts_upset ~ fu_pt_difference + Surface + Series,
+probitMod_pts <- glm(pts_upset ~ fu_pt_difference + Surface + Series + Round,
                  data=combined_odds, family=binomial(link="probit"))
 
 summary(probitMod_pts)
+stargazer(probitMod_pts)
 
 ##probit model, no instruments, upsets based on betting odds
 probitMod_B365 <- glm(B365_upset ~ fu_odds_difference + Surface + Series,
@@ -16,9 +17,28 @@ probitMod_B365 <- glm(B365_upset ~ fu_odds_difference + Surface + Series,
 
 summary(probitMod_B365)
 
-##first stage iv probit, using Bet365 as instrument
 
-ivprobitMod_1 <- ivprobit(pts_upset ~ Surface + Series | 
-                            fu_pt_difference | Surface + Series + fu_odds_difference,
-                          data=combined_odds )
-summary(probitMod)
+##first stage iv probit, using Bet365 odds as an instrument for favorite/underdog points ratio
+#dependent var = upset based on ranking point spread
+
+ivProbitMod_1 <- ivprobit(pts_upset~
+                            Series_ATP500+Series_Masters1000+Series_GrandSlam+Series_MastersCup+
+                            Surface_Hard+Surface_Clay|
+                            fu_pt_ratio|
+                            Series_ATP500+Series_Masters1000+Series_GrandSlam+Series_MastersCup+Surface_Hard+Surface_Clay+
+                            fu_odds_difference,
+                          data=combined_odds)
+summary(ivProbitMod_1)
+stargazer(ivProbitMod_1)
+
+
+##first stage iv probit, using favorite/underdog points ratio as an instrument for favorite/underdog points ratio
+ivProbitMod_2 <- ivprobit(pts_upset~
+                            Series_ATP500+Series_Masters1000+Series_GrandSlam+Series_MastersCup+
+                            Surface_Hard+Surface_Clay|
+                            fu_odds_difference|
+                            Series_ATP500+Series_Masters1000+Series_GrandSlam+Series_MastersCup+Surface_Hard+Surface_Clay+
+                            fu_pt_ratio,
+                          data=combined_odds)
+summary(ivProbitMod_2)
+stargazer(ivProbitMod_2)
