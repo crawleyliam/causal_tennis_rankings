@@ -1,7 +1,7 @@
 # EDA / summary stats
 library(xtable)
 
-# TODO: how often do upsets happen (maybe do by surface/level/etc)
+# how often do upsets happen (maybe do by surface/level/etc)
 # want to compare 
 # rank (points) upsets
 pts_upset_pct <- combined_odds_final %>% 
@@ -59,8 +59,14 @@ xtable(odds_upset_pct_by_surface)
 
 # 
 # TODO: "summary stats of key variables"
+summary_stats <- combined_odds_final %>% 
+  select(favored_pts, underdog_pts, fu_pt_difference, fu_odds_difference) %>% 
+  psych::describe() %>% 
+  as_tibble()
+summary_stats
+xtable(summary_stats)
 
-# TODO: histo of points distribution
+# histo/scatter of points distribution
 combined_odds_final %>%  
   ggplot(aes(WPts, LPts)) +
   geom_point(alpha = .1) +
@@ -68,6 +74,29 @@ combined_odds_final %>%
        subtitle = "Typical match played is at around 1000 points each",
        x = "Winner's Points",
        y = "Loser's Points")
-ggsave("figures/points_scatter.png", height = 6, width = 9, units = c("in"))
-  # TODO: scatter of different betting sites odds
+ggsave("figures/WL_points_scatter.png", height = 6, width = 9, units = c("in"))
   
+# TODO: distribution of favored and underdogs points
+
+combined_odds_final %>% 
+  ggplot(aes(favored_pts)) +
+  #geom_point(alpha = .1) +
+  geom_density()
+
+combined_odds_final %>% 
+  ggplot(aes(underdog_pts)) +
+  #geom_point(alpha = .1) +
+  geom_density()
+
+# together?
+combined_odds_final %>% 
+  select(favored_pts, underdog_pts) %>% 
+  gather(type, points) %>% 
+  ggplot(aes(points, col = type)) +
+  geom_density() +
+  labs(title = "Distribution of points by favorite status",
+       subtitle = "The typical ATP match is played between 800-1000 points")
+ggsave("figures/favorite_status_density.png", height = 6, width = 9, units = c("in"))
+
+# TODO: scatter of different betting sites odds
+combined_odds
