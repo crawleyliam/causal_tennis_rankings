@@ -24,20 +24,25 @@ combined_odds_raw <- data_file_list %>%
 
 # clean data
 combined_odds_clean <- combined_odds_raw %>% 
-  # TODO: drop everything that's not a completed match
-  filter(Comment == "Completed")
+  # drop everything that's not a completed match
+  filter(Comment == "Completed") %>% 
+  rename(best_of = `Best of`) %>% 
+  mutate(Series = recode(Series,
+                         "Grand Slam" = "GrandSlam",
+                         "Masters 1000" = "Masters1000",
+                         "Masters Cup" = "MastersCup"))
   
   
 combined_odds <- combined_odds_clean %>% 
-  # TODO: rename avg odds
+  # rename avg odds
   rename(avg_winner_odds = AvgW,
          avg_loser_odds = AvgL) %>% 
   
-# TODO: create upset columns
+# create upset columns
   mutate(rank_upset = if_else(LRank < WRank, 1, 0), # "lower" rank is better
          pts_upset = if_else(LPts > WPts, 1, 0), 
          odds_upset = if_else(avg_loser_odds < avg_winner_odds, 1, 0)) %>% 
-# TODO: favored minus underdog point difference and odds 
+# favored minus underdog point difference and odds 
   rowwise %>% 
   mutate(favored_pts = max(WPts, LPts),
          underdog_pts = min(WPts, LPts),
@@ -49,6 +54,13 @@ combined_odds <- combined_odds_clean %>%
          fu_odds_ratio = favored_odds / underdog_odds)
 glimpse(combined_odds)
 
+# TODO: create dummies for series and surface
+
+combined_odds_final <- combined_odds %>% 
+  fastDummies::dummy_cols(select_columns = "Series") %>% 
+  fastDummies::dummy_cols(select_columns = "Surface")
+
+glimpse(combined_odds_final)
 #write out data
-write_csv(combined_odds, "data/combined_odds.csv")
+write_csv(combined_odds_final, "data/combined_odds.csv")
 
