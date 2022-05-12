@@ -30,7 +30,15 @@ combined_odds_clean <- combined_odds_raw %>%
   mutate(Series = recode(Series,
                          "Grand Slam" = "GrandSlam",
                          "Masters 1000" = "Masters1000",
-                         "Masters Cup" = "MastersCup"))
+                         "Masters Cup" = "MastersCup")) %>%
+  mutate(Round = recode(Round,
+                         "1st Round" = "1stRound",
+                         "2nd Round" = "2ndRound",
+                         "3rd Round" = "3rdRound",
+                         "4th Round" = "4thRound",
+                         "Round Robin" = "RoundRobin",
+                         "The Final" = "Finals"))
+                        
   
   
 combined_odds <- combined_odds_clean %>% 
@@ -58,7 +66,8 @@ glimpse(combined_odds)
 
 combined_odds_final <- combined_odds %>% 
   fastDummies::dummy_cols(select_columns = "Series") %>% 
-  fastDummies::dummy_cols(select_columns = "Surface")
+  fastDummies::dummy_cols(select_columns = "Surface") %>%
+  fastDummies::dummy_cols(select_columns = "Round")
 
 glimpse(combined_odds_final)
 #write out data

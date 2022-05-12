@@ -60,7 +60,7 @@ xtable(odds_upset_pct_by_surface)
 # 
 # TODO: "summary stats of key variables"
 summary_stats <- combined_odds_final %>% 
-  select(favored_pts, underdog_pts, fu_pt_difference, fu_odds_difference) %>% 
+  select(favored_pts, underdog_pts, pts_upset, favored_odds, underdog_odds) %>% 
   psych::describe() %>% 
   as_tibble()
 summary_stats
