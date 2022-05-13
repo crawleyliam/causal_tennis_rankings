@@ -59,12 +59,9 @@ xtable(odds_upset_pct_by_surface)
 
 # 
 # TODO: "summary stats of key variables"
-summary_stats <- combined_odds_final %>% 
-  select(favored_pts, underdog_pts, pts_upset, favored_odds, underdog_odds) %>% 
-  psych::describe() %>% 
-  as_tibble()
-summary_stats
-xtable(summary_stats)
+summary_stats <- vtable::sumtable(combined_odds_final, 
+                                  vars=c('favored_pts', 'underdog_pts', 'pts_upset', 'favored_odds', 'underdog_odds'),
+                                  out='latex')
 
 # histo/scatter of points distribution
 combined_odds_final %>%  
